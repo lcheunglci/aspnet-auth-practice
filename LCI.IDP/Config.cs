@@ -31,7 +31,7 @@ namespace LCI.IDP
                     AllowedGrantTypes = GrantTypes.Code,
                     RedirectUris = new List<string>()
                     {
-                        "https://localhost:44389/sigin-oidbc"
+                        "https://localhost:44389/signin-oidc"
                     },
                     AllowedScopes =
                     {
