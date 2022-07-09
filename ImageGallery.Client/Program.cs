@@ -36,6 +36,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("profile");
         options.SaveTokens = true;
         options.ClientSecret = "secret";
+        options.GetClaimsFromUserInfoEndpoint = true;
     });
 
 var app = builder.Build();
