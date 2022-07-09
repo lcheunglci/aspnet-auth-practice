@@ -32,11 +32,11 @@ namespace LCI.IDP
                     RequirePkce = true,
                     RedirectUris = new List<string>()
                     {
-                        "https://localhost:44389/signin-oidc"
+                        "https://localhost:44333/signin-oidc"
                     },
                     PostLogoutRedirectUris = new List<string>()
                     {
-                        "https://localhost:44389/signout-callback-oidc"
+                        "https://localhost:44333/signout-callback-oidc"
                     },
                     AllowedScopes =
                     {
