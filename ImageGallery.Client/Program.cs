@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -38,6 +41,8 @@ builder.Services.AddAuthentication(options =>
         options.ClientSecret = "secret";
         options.GetClaimsFromUserInfoEndpoint = true;
     });
+
+
 
 var app = builder.Build();
 
