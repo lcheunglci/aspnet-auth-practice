@@ -34,11 +34,7 @@ builder.Services.AddAuthentication(options =>
         options.Authority = "https://localhost:44318";
         options.ClientId = "imagegalleryclient";
         options.ResponseType = "code";
-        // options.UsePkce = false;
-        //options.CallbackPath = new PathString("...");
-        options.Scope.Add("openid");
-        options.Scope.Add("profile");
-        // options.ClaimActions.Remove("nbf");
+        options.Scope.Add("address");
         options.ClaimActions.DeleteClaim("sid");
         options.ClaimActions.DeleteClaim("idp");
         options.ClaimActions.DeleteClaim("s_hash");
