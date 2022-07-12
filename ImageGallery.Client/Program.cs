@@ -1,6 +1,8 @@
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -50,6 +52,11 @@ builder.Services.AddAuthentication(options =>
         options.SaveTokens = true;
         options.ClientSecret = "secret";
         options.GetClaimsFromUserInfoEndpoint = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            NameClaimType = JwtClaimTypes.GivenName,
+            RoleClaimType = JwtClaimTypes.Role
+        };
     });
 
 
