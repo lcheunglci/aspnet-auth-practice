@@ -41,10 +41,12 @@ builder.Services.AddAuthentication(options =>
         options.ClientId = "imagegalleryclient";
         options.ResponseType = "code";
         options.Scope.Add("address");
+        options.Scope.Add("roles");
         options.ClaimActions.DeleteClaim("sid");
         options.ClaimActions.DeleteClaim("idp");
         options.ClaimActions.DeleteClaim("s_hash");
         options.ClaimActions.DeleteClaim("auth_time");
+        options.ClaimActions.MapUniqueJsonKey("role", "role");
         options.SaveTokens = true;
         options.ClientSecret = "secret";
         options.GetClaimsFromUserInfoEndpoint = true;
