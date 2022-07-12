@@ -1,3 +1,4 @@
+using IdentityServer4.AccessTokenValidation;
 using ImageGallery.API.Entities;
 using ImageGallery.API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
+
+builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+    .AddIdentityServerAuthentication(options =>
+    {
+        options.Authority = "https://localhost:44318";
+        options.ApiName = "imagegalleryapi";
+    });
 
 // register the DbContext on the container, getting the connection string from
 // appSettings (note: use this during development; in a production environment,
@@ -57,9 +65,11 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-// app.UseAuthorization();
-
 app.UseRouting();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {

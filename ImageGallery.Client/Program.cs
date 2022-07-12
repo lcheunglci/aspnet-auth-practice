@@ -47,6 +47,7 @@ builder.Services.AddAuthentication(options =>
         options.ResponseType = "code";
         options.Scope.Add("address");
         options.Scope.Add("roles");
+        options.Scope.Add("imagegalleryapi");
         options.ClaimActions.DeleteClaim("sid");
         options.ClaimActions.DeleteClaim("idp");
         options.ClaimActions.DeleteClaim("s_hash");

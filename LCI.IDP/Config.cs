@@ -26,6 +26,12 @@ namespace LCI.IDP
             new ApiScope[]
             { };
 
+        public static IEnumerable<ApiResource> Apis =>
+            new ApiResource[]
+            {
+                new ApiResource("imagegalleryapi", "Image Gallery API")
+            };
+
         public static IEnumerable<Client> Clients =>
             new Client[]
             {
@@ -48,7 +54,8 @@ namespace LCI.IDP
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
-                        "roles"
+                        "roles",
+                        "imagegalleryapi"
                     },
                     ClientSecrets =
                     {
