@@ -27,7 +27,9 @@ namespace IdentityServerHost.Quickstart.UI
                             new Claim(JwtClaimTypes.GivenName, "Allen"),
                             new Claim(JwtClaimTypes.FamilyName, "Doe"),
                             new Claim(JwtClaimTypes.Address, "Avenue Way 48"),
-                            new Claim("role", "FreeUser")
+                            new Claim("role", "FreeUser"),
+                            new Claim("subscriptionlevel", "FreeUser"),
+                            new Claim("country", "ca")
                         }
                     },
                     new TestUser
@@ -40,7 +42,10 @@ namespace IdentityServerHost.Quickstart.UI
                             new Claim(JwtClaimTypes.GivenName, "Brian"),
                             new Claim(JwtClaimTypes.FamilyName, "Smith"),
                             new Claim(JwtClaimTypes.Address, "Main Road 2"),
-                            new Claim("role", "PayingUser")
+                            new Claim("role", "PayingUser"),
+                                                        new Claim("subscriptionlevel", "FreeUser"),
+                            new Claim("country", "uk")
+
                         }
                     },
                     new TestUser
@@ -54,7 +59,9 @@ namespace IdentityServerHost.Quickstart.UI
                              new Claim("given_name", "Frank"),
                              new Claim("family_name", "Underwood"),
                              new Claim(JwtClaimTypes.Address, "Main Road 1"),
-                             new Claim("role", "FreeUser")
+                             new Claim("role", "FreeUser"),
+                             new Claim("subscriptionlevel", "FreeUser"),
+                             new Claim("country", "nl")
                          }
                      },
                      new TestUser
@@ -68,7 +75,10 @@ namespace IdentityServerHost.Quickstart.UI
                              new Claim("given_name", "Claire"),
                              new Claim("family_name", "Underwood"),
                              new Claim(JwtClaimTypes.Address, "Big Street 2"),
-                             new Claim("role", "PayingUser")
+                             new Claim("role", "PayingUser"),
+                             new Claim("subscriptionlevel", "PayingUser"),
+                             new Claim("country", "be")
+
                          }
                      }
                 };

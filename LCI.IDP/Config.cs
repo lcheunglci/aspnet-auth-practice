@@ -19,7 +19,15 @@ namespace LCI.IDP
                 new IdentityResource(
                     "roles",
                     "Your role(s)",
-                    new List<string>() {"role"})
+                    new List<string>() {"role"}),
+                new IdentityResource(
+                    "country",
+                    "The country you're living in",
+                    new List<string>() {"country"}),
+                new IdentityResource(
+                    "subscriptionlevel",
+                    "Your subscription level",
+                    new List<string>() {"subscriptionlevel"})
             };
 
         public static IEnumerable<ApiScope> ApiScopes =>
@@ -58,7 +66,9 @@ namespace LCI.IDP
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
                         "roles",
-                        "imagegalleryapi"
+                        "imagegalleryapi",
+                        "country",
+                        "subscriptionlevel"
                     },
                     ClientSecrets =
                     {
