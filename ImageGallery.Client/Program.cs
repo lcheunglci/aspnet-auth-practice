@@ -1,4 +1,5 @@
 using IdentityModel;
+using ImageGallery.Client.Controllers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -15,6 +16,8 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<BearerTokenHandler>();
 
 // create an HttpClient used for accessing the API
 builder.Services.AddHttpClient("APIClient", client =>
@@ -22,7 +25,7 @@ builder.Services.AddHttpClient("APIClient", client =>
         client.BaseAddress = new Uri("https://localhost:44366/");
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-    });
+    }).AddHttpMessageHandler<BearerTokenHandler>();
 builder.Services.AddHttpClient("IDPClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:44318/");
