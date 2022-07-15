@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
-namespace ImageGallery.Client.Controllers
+namespace ImageGallery.Client.HttpHandlers
 {
     public class BearerTokenHandler : DelegatingHandler
     {
@@ -19,6 +19,9 @@ namespace ImageGallery.Client.Controllers
         {
             var accessToken = await _httpContextAccessor
                 .HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
+            var refreshToken = await _httpContextAccessor
+                .HttpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken);
 
             if (!string.IsNullOrWhiteSpace(accessToken))
             {

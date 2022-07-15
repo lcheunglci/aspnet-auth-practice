@@ -51,6 +51,11 @@ namespace LCI.IDP
                     // IdentityTokenLifetime = 300, // default is 5 minutes
                     // AuthorizationCodeLifetime = 300, // default is 5 minutes
                     AccessTokenLifetime = 120, // 2 minutes, (but, middle ware take 5 minute queue, so it's actually 5 minutes) default is 1 hour 
+                    AllowOfflineAccess = true,
+                    RefreshTokenExpiration = TokenExpiration.Sliding, // once a refresh token is requested then its lifetime is renewed
+                    // SlidingRefreshTokenLifetime = ... // default is 15d, and will not exceed the AbsoluteRefreshToken lifetime
+                    // AbsoluteRefreshTokenLifetime = ... // default is 30d
+                    UpdateAccessTokenClaimsOnRefresh = true,
                     ClientName = "Image Gallery",
                     ClientId= "imagegalleryclient",
                     AllowedGrantTypes = GrantTypes.Code,

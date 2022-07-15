@@ -15,8 +15,4 @@
     <ProjectReference Include="..\ImageGallery.Model\ImageGallery.Model.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="HttpHandlers\" />
-  </ItemGroup>
-
 </Project>

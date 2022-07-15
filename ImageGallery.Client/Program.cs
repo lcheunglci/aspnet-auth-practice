@@ -1,5 +1,5 @@
 using IdentityModel;
-using ImageGallery.Client.Controllers;
+using ImageGallery.Client.HttpHandlers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -67,6 +67,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("imagegalleryapi");
         options.Scope.Add("subscriptionlevel");
         options.Scope.Add("country");
+        options.Scope.Add("offline_access");
         options.ClaimActions.DeleteClaim("sid");
         options.ClaimActions.DeleteClaim("idp");
         options.ClaimActions.DeleteClaim("s_hash");
