@@ -31,6 +31,7 @@ builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.Authenti
     {
         options.Authority = "https://localhost:44318";
         options.ApiName = "imagegalleryapi";
+        options.ApiSecret = "apisecret";
     });
 
 // register the DbContext on the container, getting the connection string from
