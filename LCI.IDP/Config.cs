@@ -48,6 +48,9 @@ namespace LCI.IDP
             {
                 new Client
                 {
+                    // IdentityTokenLifetime = 300, // default is 5 minutes
+                    // AuthorizationCodeLifetime = 300, // default is 5 minutes
+                    AccessTokenLifetime = 120, // 2 minutes, (but, middle ware take 5 minute queue, so it's actually 5 minutes) default is 1 hour 
                     ClientName = "Image Gallery",
                     ClientId= "imagegalleryclient",
                     AllowedGrantTypes = GrantTypes.Code,
