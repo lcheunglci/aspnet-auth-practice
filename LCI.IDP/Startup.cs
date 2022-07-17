@@ -61,6 +61,13 @@ namespace LCI.IDP
                 builder.UseSqlServer(lciIDPDataDBConnectionString,
                 options => options.MigrationsAssembly(migrationAssembly));
             });
+
+            builder.AddOperationalStore(options =>
+            {
+                options.ConfigureDbContext = builder =>
+                    builder.UseSqlServer(lciIDPDataDBConnectionString,
+                    options => options.MigrationsAssembly(migrationAssembly));
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -112,6 +119,9 @@ namespace LCI.IDP
             using (var serviceScope = app.ApplicationServices
                 .GetService<IServiceScopeFactory>().CreateScope())
             {
+                serviceScope.ServiceProvider
+                    .GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+
                 var context = serviceScope.ServiceProvider
                     .GetRequiredService<ConfigurationDbContext>();
                 context.Database.Migrate();
