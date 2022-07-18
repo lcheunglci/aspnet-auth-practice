@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LCI.IDP.Entities
 {
-    public class User
+    public class User : IConcurrencyAware
     {
         [Key]
         public Guid Id { get; set; }

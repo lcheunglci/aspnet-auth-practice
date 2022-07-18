@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LCI.IDP.Entities
 {
-    public class UserClaim
+    public class UserClaim : IConcurrencyAware
     {
         [Key]
         public Guid Id { get; set; }

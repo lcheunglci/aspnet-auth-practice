@@ -1,5 +1,6 @@
 ﻿using LCI.IDP.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,8 +30,14 @@ namespace LCI.IDP.DbContexts
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             // get updated entries
-            var updateEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Modified);
+            var updatedConcurrencyAwareEntries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified)
+                .OfType<IConcurrencyAware>();
 
+            foreach (var entry in updatedConcurrencyAwareEntries)
+            {
+                entry.ConcurrencyStamp = Guid.NewGuid().ToString();
+            }
 
             return base.SaveChangesAsync(cancellationToken);
         }
