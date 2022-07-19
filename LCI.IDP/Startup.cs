@@ -5,6 +5,7 @@
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServerHost.Quickstart.UI;
+using LCI.IDP.DbContexts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +32,13 @@ namespace LCI.IDP
             var lciIDPDataDBConnectionString =
                 "Server=(localdb)\\mssqllocaldb;Database=LCIIDPDataDB;Trusted_Connection=True;";
 
+            var lciIdentityConnectionString =
+                "Server=(localdb)\\mssqllocaldb;Database=LCIIDPIdentityDB;Trusted_Connection=True;";
+
             // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
+
+            services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(lciIdentityConnectionString));
 
             var builder = services.AddIdentityServer(options =>
             {
