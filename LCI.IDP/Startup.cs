@@ -4,7 +4,6 @@
 
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
-using IdentityServerHost.Quickstart.UI;
 using LCI.IDP.DbContexts;
 using LCI.IDP.Services;
 using Microsoft.AspNetCore.Builder;
@@ -47,12 +46,12 @@ namespace LCI.IDP
             {
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
-            })
-                //.AddInMemoryIdentityResources(Config.IdentityResources)
-                //.AddInMemoryApiScopes(Config.ApiScopes)
-                //.AddInMemoryApiResources(Config.Apis)
-                //.AddInMemoryClients(Config.Clients)
-                .AddTestUsers(TestUsers.Users);
+            });
+            //.AddInMemoryIdentityResources(Config.IdentityResources)
+            //.AddInMemoryApiScopes(Config.ApiScopes)
+            //.AddInMemoryApiResources(Config.Apis)
+            //.AddInMemoryClients(Config.Clients)
+            //.AddTestUsers(TestUsers.Users);
 
 
             // not recommended for production - you need to store your key material somewhere secure
