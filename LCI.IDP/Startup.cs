@@ -6,6 +6,7 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServerHost.Quickstart.UI;
 using LCI.IDP.DbContexts;
+using LCI.IDP.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,8 @@ namespace LCI.IDP
             services.AddControllersWithViews();
 
             services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(lciIdentityConnectionString));
+
+            services.AddScoped<ILocalUserService, LocalUserService>();
 
             var builder = services.AddIdentityServer(options =>
             {
