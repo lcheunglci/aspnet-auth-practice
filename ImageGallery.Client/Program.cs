@@ -81,14 +81,6 @@ builder.Services.AddAuthentication(options =>
             NameClaimType = JwtClaimTypes.GivenName,
             RoleClaimType = JwtClaimTypes.Role
         };
-        options.Events = new OpenIdConnectEvents()
-        {
-            OnTokenValidated = async tokenValidatedContext =>
-            {
-                var serviceProvider = builder.Services.BuildServiceProvider();
-                var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
-            }
-        };
     });
 
 
