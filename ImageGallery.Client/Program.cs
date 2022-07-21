@@ -65,7 +65,6 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("address");
         options.Scope.Add("roles");
         options.Scope.Add("imagegalleryapi");
-        options.Scope.Add("subscriptionlevel");
         options.Scope.Add("country");
         options.Scope.Add("offline_access");
         options.ClaimActions.DeleteClaim("sid");
@@ -73,7 +72,6 @@ builder.Services.AddAuthentication(options =>
         options.ClaimActions.DeleteClaim("s_hash");
         options.ClaimActions.DeleteClaim("auth_time");
         options.ClaimActions.MapUniqueJsonKey("role", "role");
-        options.ClaimActions.MapUniqueJsonKey("subscriptionlevel", "subscriptionlevel");
         options.ClaimActions.MapUniqueJsonKey("country", "country");
         options.SaveTokens = true;
         options.ClientSecret = "secret";
@@ -82,6 +80,14 @@ builder.Services.AddAuthentication(options =>
         {
             NameClaimType = JwtClaimTypes.GivenName,
             RoleClaimType = JwtClaimTypes.Role
+        };
+        options.Events = new OpenIdConnectEvents()
+        {
+            OnTokenValidated = async tokenValidatedContext =>
+            {
+                var serviceProvider = builder.Services.BuildServiceProvider();
+                var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+            }
         };
     });
 
