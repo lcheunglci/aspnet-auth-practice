@@ -48,7 +48,7 @@ builder.Services.AddHttpClient("BasicAPIClient", client =>
     client.BaseAddress = new Uri("https://localhost:44366/");
     client.DefaultRequestHeaders.Clear();
     client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-})
+});
 
 
 builder.Services.AddHttpClient("IDPClient", client =>
