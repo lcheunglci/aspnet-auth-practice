@@ -1,8 +1,10 @@
 using IdentityModel;
 using ImageGallery.Client.HttpHandlers;
+using ImageGallery.Client.PostConfigurationOptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
@@ -40,6 +42,15 @@ builder.Services.AddHttpClient("APIClient", client =>
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
     }).AddHttpMessageHandler<BearerTokenHandler>();
+
+builder.Services.AddHttpClient("BasicAPIClient", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:44366/");
+    client.DefaultRequestHeaders.Clear();
+    client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+})
+
+
 builder.Services.AddHttpClient("IDPClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:44318/");
@@ -81,6 +92,9 @@ builder.Services.AddAuthentication(options =>
             NameClaimType = JwtClaimTypes.GivenName,
             RoleClaimType = JwtClaimTypes.Role
         };
+
+        builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>,
+        OpenIdConnectOptionsPostConfigureOptions>();
     });
 
 

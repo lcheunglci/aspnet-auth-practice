@@ -1,6 +1,9 @@
-﻿using ImageGallery.Model;
+﻿using IdentityModel.Client;
+using ImageGallery.Model;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace ImageGallery.Client.PostConfigurationOptions
@@ -21,11 +24,13 @@ namespace ImageGallery.Client.PostConfigurationOptions
                 {
                     var subject = ticketReceivedContext.Principal.Claims.FirstOrDefault(c => c.Type == "sub").Value;
 
-                    var apiClient = _httpClientFactory.CreateClient("APIClient");
+                    var apiClient = _httpClientFactory.CreateClient("BasicAPIClient");
 
                     var request = new HttpRequestMessage(
                         HttpMethod.Get,
                         $"/api/applicationuserprofiles/{subject}");
+
+                    request.SetBearerToken(ticketReceivedContext.Properties.GetTokenValue("access_token"));
 
                     var response = await apiClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
@@ -34,9 +39,15 @@ namespace ImageGallery.Client.PostConfigurationOptions
                     var applicationUserProfile = new ApplicationUserProfile();
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
-                        applicationUserProfile = await JsonSerializer.Deserialize<ApplicationUserProfile>(responseStream);
+                        applicationUserProfile = await JsonSerializer.DeserializeAsync<ApplicationUserProfile>(responseStream);
                     }
 
+                    var newClaimIdentity = new ClaimsIdentity();
+                    newClaimIdentity.AddClaim(
+                        new Claim("subscriptionlevel", applicationUserProfile.SubscriptionLevel));
+
+                    // add this additional identity
+                    ticketReceivedContext.Principal.AddIdentity(newClaimIdentity);
 
                 }
             };
