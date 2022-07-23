@@ -13,6 +13,8 @@ builder.Services.AddControllers()
     .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
 
 builder.Services.AddScoped<IAuthorizationHandler, MustOwnImageHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, SubscriptionLevelHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, SubjectMustMatchUserHandler>();
 
 builder.Services.AddAuthorization(authorizationOptions =>
 {
@@ -24,6 +26,24 @@ builder.Services.AddAuthorization(authorizationOptions =>
             policyBuilder.AddRequirements(
                 new MustOwnImageRequirement());
         });
+    authorizationOptions.AddPolicy(
+        "SubjectMustMatchUser",
+        policyBuilder =>
+        {
+            policyBuilder.RequireAuthenticatedUser();
+            policyBuilder.AddRequirements(
+                new SubjectMustMatchUserRequirement());
+        });
+
+    authorizationOptions.AddPolicy(
+        "MustBePayingUser",
+        policyBuilder =>
+        {
+            policyBuilder.RequireAuthenticatedUser();
+            policyBuilder.AddRequirements(
+                new SubscriptionLevelRequirement("PayingUser"));
+        });
+
 });
 
 builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
