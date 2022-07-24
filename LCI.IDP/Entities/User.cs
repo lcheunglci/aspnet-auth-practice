@@ -19,6 +19,11 @@ namespace LCI.IDP.Entities
         [MaxLength(200)]
         public string Password { get; set; }
 
+
+        [MaxLength(200)]
+        public string Email { get; set; }
+
+
         [MaxLength(200)]
         public bool Active { get; set; }
 

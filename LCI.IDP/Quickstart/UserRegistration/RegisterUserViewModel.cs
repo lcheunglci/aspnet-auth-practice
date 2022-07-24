@@ -15,6 +15,12 @@ namespace LCI.IDP.UserRegistration
 
         [Required]
         [MaxLength(250)]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+
+        [Required]
+        [MaxLength(250)]
         [Display(Name = "Given name")]
         public string GivenName { get; set; }
 
