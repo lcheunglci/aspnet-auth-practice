@@ -8,6 +8,7 @@ using LCI.IDP.DbContexts;
 using LCI.IDP.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,6 +41,7 @@ namespace LCI.IDP
 
             services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(lciIdentityConnectionString));
 
+            services.AddScoped<IPasswordHasher<Entities.User>, PasswordHasher<Entities.User>>();
             services.AddScoped<ILocalUserService, LocalUserService>();
 
             var builder = services.AddIdentityServer(options =>
