@@ -23,6 +23,12 @@ namespace LCI.IDP.Entities
         [MaxLength(200)]
         public string Email { get; set; }
 
+        [MaxLength(200)]
+        public string SecurityCode { get; set; }
+
+        [MaxLength(200)]
+        public DateTime SecurityCodeExpirationDate { get; set; }
+
 
         [MaxLength(200)]
         public bool Active { get; set; }
