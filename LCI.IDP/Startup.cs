@@ -55,10 +55,26 @@ namespace LCI.IDP
             //.AddInMemoryClients(Config.Clients)
             //.AddTestUsers(TestUsers.Users);
 
-            builder.AddProfileService<LocalUserProfileService>();
+            // builder.AddProfileService<LocalUserProfileService>();
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
+
+
+            // configures IIS out-of-proc settings
+            services.Configure<IISOptions>(iis =>
+            {
+                iis.AuthenticationDisplayName = "Windows";
+                iis.AutomaticAuthentication = false;
+            });
+
+
+            // .. or configures IIS in-proc settings
+            services.Configure<IISServerOptions>(iis =>
+            {
+                iis.AuthenticationDisplayName = "Windows";
+                iis.AutomaticAuthentication = false;
+            });
 
             // Use the following in production
             //builder.AddSigningCredential(LoadCertificateFromStore());
