@@ -68,13 +68,23 @@ namespace LCI.IDP
                 iis.AutomaticAuthentication = false;
             });
 
-
             // .. or configures IIS in-proc settings
             services.Configure<IISServerOptions>(iis =>
             {
                 iis.AuthenticationDisplayName = "Windows";
                 iis.AutomaticAuthentication = false;
             });
+
+
+            services.AddAuthentication().AddFacebook(
+                "Facebook",
+                options =>
+                {
+                    options.AppId = "YOUR_FB_APP_ID_PLACEHOLDER";
+                    options.AppSecret = "YOUR_APP_SECRET_PLACEHOLDER";
+                    options.SignInScheme =
+                        IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                });
 
             // Use the following in production
             //builder.AddSigningCredential(LoadCertificateFromStore());
@@ -114,7 +124,7 @@ namespace LCI.IDP
             app.UseIdentityServer();
 
             // uncomment, if you want to add MVC
-            //app.UseAuthorization();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
