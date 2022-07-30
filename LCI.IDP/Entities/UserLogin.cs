@@ -18,6 +18,8 @@ namespace LCI.IDP.Entities
 
         [Required]
         public Guid UserId { get; set; }
+
+        public User User { get; set; }
         public string ConcurrencyStamp { get; set; } = Guid.NewGuid().ToString();
     }
 }
