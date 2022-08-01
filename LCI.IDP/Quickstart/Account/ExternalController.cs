@@ -39,6 +39,13 @@ namespace IdentityServerHost.Quickstart.UI
                 { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", JwtClaimTypes.Email },
             };
 
+        private readonly Dictionary<string, string> _windowsKeyMap =
+            new Dictionary<string, string>()
+            {
+                // note: this example user the sid, mapped to the user and this user id does not exist.
+                { "S-1-5-21-1234567890-1234567890-1234567890-1234", "340041F4-BA40-4F03-8232-A3C2DE90A129" },
+            };
+
         public ExternalController(
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
@@ -138,7 +145,7 @@ namespace IdentityServerHost.Quickstart.UI
                 }
                 else
                 {
-                    user = await AutoProvisionUser(provider, providerUserId, claims);
+                    user = await AutoProvisionWindowsUser(provider, providerUserId, claims);
                 }
             }
 
@@ -209,16 +216,37 @@ namespace IdentityServerHost.Quickstart.UI
             return (user, provider, providerUserId, claims);
         }
 
-        private async Task<LCI.IDP.Entities.User> AutoProvisionUser(string provider, string providerUserId, IEnumerable<Claim> claims)
+        private async Task<LCI.IDP.Entities.User> AutoProvisionWindowsUser(string provider, string providerUserId, IEnumerable<Claim> claims)
         {
-            var mappedCliams = new List<Claim>();
-            // map the claims, and ignore those for which no mapping exists
-            foreach (var claim in claims)
+            //var mappedCliams = new List<Claim>();
+            //// map the claims, and ignore those for which no mapping exists
+            //foreach (var claim in claims)
+            //{
+            //    if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+            //    {
+            //        mappedCliams.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+            //    }
+            //}
+
+
+
+            if (_windowsKeyMap.ContainsKey(providerUserId))
             {
-                if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                // finding matching user
+                var existingUser = await
+                    _localUserService.GetUserBySubjectAsync(_windowsKeyMap[providerUserId]);
+
+                if (existingUser != null)
                 {
-                    mappedCliams.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+                    await _localUserService.AddExternalProviderToUser(
+                        existingUser.Subject,
+                        provider,
+                        providerUserId);
                 }
+
+                await _localUserService.SaveChangesAsync();
+
+                return existingUser;
             }
 
             var user = _localUserService.ProvisionUserFromExternalIdentity(provider, providerUserId, mappedCliams);
