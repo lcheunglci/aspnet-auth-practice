@@ -55,7 +55,7 @@ namespace LCI.IDP
             //.AddInMemoryClients(Config.Clients)
             //.AddTestUsers(TestUsers.Users);
 
-            // builder.AddProfileService<LocalUserProfileService>();
+            builder.AddProfileService<LocalUserProfileService>();
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();

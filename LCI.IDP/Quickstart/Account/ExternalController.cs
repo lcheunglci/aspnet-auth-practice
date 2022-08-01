@@ -3,7 +3,7 @@ using IdentityServer4;
 using IdentityServer4.Events;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
-using IdentityServer4.Test;
+// using IdentityServer4.Test;
 using LCI.IDP;
 using LCI.IDP.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -30,6 +30,13 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly ILogger<ExternalController> _logger;
         private readonly IEventService _events;
         private readonly ILocalUserService _localUserService;
+        private readonly Dictionary<string, string> _facebookClaimTypeMap =
+            new Dictionary<string, string>()
+            {
+                { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", JwtClaimTypes.GivenName },
+                { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", JwtClaimTypes.FamilyName },
+                { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", JwtClaimTypes.Email },
+            };
 
         public ExternalController(
             IIdentityServerInteractionService interaction,
@@ -186,7 +193,17 @@ namespace IdentityServerHost.Quickstart.UI
 
         private async Task<LCI.IDP.Entities.User> AutoProvisionUser(string provider, string providerUserId, IEnumerable<Claim> claims)
         {
-            var user = _localUserService.ProvisionUserFromExternalIdentity(provider, providerUserId, claims.ToList());
+            var mappedCliams = new List<Claim>();
+            // map the claims, and ignore those for which no mapping exists
+            foreach (var claim in claims)
+            {
+                if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                {
+                    mappedCliams.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value);
+                }
+            }
+
+            var user = _localUserService.ProvisionUserFromExternalIdentity(provider, providerUserId, mappedCliams);
 
             await _localUserService.SaveChangesAsync();
 
