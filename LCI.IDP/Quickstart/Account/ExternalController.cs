@@ -199,7 +199,7 @@ namespace IdentityServerHost.Quickstart.UI
             {
                 if (_facebookClaimTypeMap.ContainsKey(claim.Type))
                 {
-                    mappedCliams.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value);
+                    mappedCliams.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
                 }
             }
 
