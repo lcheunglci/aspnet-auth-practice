@@ -6,6 +6,7 @@ using IdentityServer4.Stores;
 // using IdentityServer4.Test;
 using LCI.IDP;
 using LCI.IDP.Services;
+using LCI.IDP.UserRegistration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -121,7 +122,24 @@ namespace IdentityServerHost.Quickstart.UI
                 // this might be where you might initiate a custom workflow for user registration
                 // in this sample we don't show how that would be done, as our sample implementation
                 // simply auto-provisions new external user
-                user = await AutoProvisionUser(provider, providerUserId, claims);
+                if (provider == "Facebook")
+                {
+                    // redirect to the RegisterUserForFacebook view.
+                    return RedirectToAction(
+                        "RegisterUserfromFacebook", 
+                        new RegisterUserFromFacebookInputViewModel()
+                        {
+                            Email = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value,
+                            GivenName = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value,
+                            FamilyName = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value,
+                            Provider = provider,
+                            ProviderUserId = providerUserId
+                        });
+                }
+                else
+                {
+                    user = await AutoProvisionUser(provider, providerUserId, claims);
+                }
             }
 
             // this allows us to collect any additional claims or properties
