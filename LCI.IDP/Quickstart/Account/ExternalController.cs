@@ -210,7 +210,7 @@ namespace IdentityServerHost.Quickstart.UI
 
             // find external user
             // var user = _users.FindByExternalProvider(provider, providerUserId);
-            var user = await AutoProvisionUser(provider, providerUserId, claims.ToList());
+            var user = await AutoProvisionWindowsUser(provider, providerUserId, claims.ToList());
 
 
             return (user, provider, providerUserId, claims);
@@ -249,7 +249,7 @@ namespace IdentityServerHost.Quickstart.UI
                 return existingUser;
             }
 
-            var user = _localUserService.ProvisionUserFromExternalIdentity(provider, providerUserId, mappedCliams);
+            var user = _localUserService.ProvisionUserFromExternalIdentity(provider, providerUserId, new List<Claim>());
 
             await _localUserService.SaveChangesAsync();
 
