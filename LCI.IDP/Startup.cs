@@ -86,6 +86,12 @@ namespace LCI.IDP
                         IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 });
 
+
+            services.AddAuthentication(options =>
+            {
+                options.RequireAuthenticatedSignIn = true;
+            }).AddCookie("idsrv.mfa");
+
             // Use the following in production
             //builder.AddSigningCredential(LoadCertificateFromStore());
 

@@ -3,7 +3,6 @@
 
 
 using IdentityModel;
-using IdentityServer4;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
@@ -11,13 +10,17 @@ using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using LCI.IDP;
 using LCI.IDP.Services;
+using LCI.IDP.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using IdentityServer4;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -35,6 +38,8 @@ namespace IdentityServerHost.Quickstart.UI
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
+        // ideally this should be hard coded here.
+        private readonly string _totpSecret = "E66B8175C2C24666";
 
         public AccountController(
             IIdentityServerInteractionService interaction,
@@ -54,6 +59,109 @@ namespace IdentityServerHost.Quickstart.UI
             _schemeProvider = schemeProvider;
             _events = events;
         }
+
+
+        [HttpGet]
+        public IActionResult AdditionalAuthenticationFactor(
+            string returnUrl, bool rememberLogin)
+        {
+            // create VM
+            var vm = new AdditionalAuthenticationFactorViewModel()
+            {
+                RememberLogin = rememberLogin,
+                ReturnUrl = returnUrl
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AdditionalAuthenticationFactor(
+            AdditionalAuthenticationFactorViewModel model)
+        {
+            // check if we are in the context of an authorization request
+            var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+
+            if (ModelState.IsValid)
+            {
+                // read identity from the temporary cookie
+                var result = await HttpContext.AuthenticateAsync("idsrv.mfa");
+                if (result?.Succeeded != true)
+                {
+                    throw new Exception("MFA authentication error");
+                }
+
+                var subject = result.Principal.FindFirst(JwtClaimTypes.Subject)?.Value;
+                var user = await _localUserService.GetUserBySubjectAsync(subject);
+
+                var authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
+                if (!authenticator.CheckCode(_totpSecret, model.Totp, user))
+                {
+                    ModelState.AddModelError("totp", "TOTP is invalid");
+                    return View(model);
+                }
+
+                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Subject, user.UserName, clientId: context?.Client.ClientId));
+
+                // only set explicit expiration here if user chooses "remember me". 
+                // otherwise we rely upon expiration configured in cookie middleware.
+                AuthenticationProperties props = null;
+                if (AccountOptions.AllowRememberLogin && model.RememberLogin)
+                {
+                    props = new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
+                    };
+                };
+
+                // issue authentication cookie with subject ID and username
+                //await HttpContext.SignInAsync(user.Subject, user.UserName, props);
+
+                var isuser = new IdentityServerUser(user.Subject)
+                {
+                    DisplayName = user.UserName
+                };
+
+                await HttpContext.SignInAsync(isuser, props);
+
+                // delete temporary cookie used during mfa
+                await HttpContext.SignOutAsync("idsrv.mfa");
+
+                if (context != null)
+                {
+                    if (context.IsNativeClient())
+                    {
+                        // The client is native, so this change in how to
+                        // return the response is for better UX for the end user.
+                        return this.LoadingPage("Redirect", model.ReturnUrl);
+                    }
+
+                    // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
+                    return Redirect(model.ReturnUrl);
+                }
+
+                // request for a local page
+                if (Url.IsLocalUrl(model.ReturnUrl))
+                {
+                    return Redirect(model.ReturnUrl);
+                }
+                else if (string.IsNullOrEmpty(model.ReturnUrl))
+                {
+                    return Redirect("~/");
+                }
+                else
+                {
+                    // user might have clicked on a malicious link - should be logged
+                    throw new Exception("invalid return URL");
+                }
+
+            }
+
+            return View(model);
+        }
+
 
         /// <summary>
         /// Entry point into the login workflow
@@ -116,55 +224,26 @@ namespace IdentityServerHost.Quickstart.UI
                 if (await _localUserService.ValidateCredentialsAsync(model.Username, model.Password))
                 {
                     var user = await _localUserService.GetUserByUserNameAsync(model.Username);
-                    await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Subject, user.UserName, clientId: context?.Client.ClientId));
 
-                    // only set explicit expiration here if user chooses "remember me". 
-                    // otherwise we rely upon expiration configured in cookie middleware.
-                    AuthenticationProperties props = null;
-                    if (AccountOptions.AllowRememberLogin && model.RememberLogin)
-                    {
-                        props = new AuthenticationProperties
+                    // issue temporary authentication ticket
+                    var temporaryIdentity = new ClaimsIdentity();
+                    temporaryIdentity.AddClaim(new Claim(JwtClaimTypes.Subject, user.Subject));
+
+                    await HttpContext.SignInAsync("idsrv.mfa", new ClaimsPrincipal(temporaryIdentity));
+
+                    var authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
+                    var totp = authenticator.GetCode(_totpSecret);
+
+                    // send OTP by mail (fake this by writing it to the debug output window)
+                    Debug.WriteLine($"OTP: {totp}");
+
+                    var redirectToAdditionalFactorUrl =
+                        Url.Action("AdditionalAuthenticationFactor",
+                        new
                         {
-                            IsPersistent = true,
-                            ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
-                        };
-                    };
-
-                    // issue authentication cookie with subject ID and username
-                    var isuser = new IdentityServerUser(user.Subject)
-                    {
-                        DisplayName = user.UserName
-                    };
-
-                    await HttpContext.SignInAsync(isuser, props);
-
-                    if (context != null)
-                    {
-                        if (context.IsNativeClient())
-                        {
-                            // The client is native, so this change in how to
-                            // return the response is for better UX for the end user.
-                            return this.LoadingPage("Redirect", model.ReturnUrl);
-                        }
-
-                        // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
-                        return Redirect(model.ReturnUrl);
-                    }
-
-                    // request for a local page
-                    if (Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else if (string.IsNullOrEmpty(model.ReturnUrl))
-                    {
-                        return Redirect("~/");
-                    }
-                    else
-                    {
-                        // user might have clicked on a malicious link - should be logged
-                        throw new Exception("invalid return URL");
-                    }
+                            returnUrl = model.ReturnUrl,
+                            rememberLogin = model.RememberLogin
+                        });
                 }
 
                 await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.Client.ClientId));
