@@ -95,8 +95,11 @@ namespace IdentityServerHost.Quickstart.UI
                 var subject = result.Principal.FindFirst(JwtClaimTypes.Subject)?.Value;
                 var user = await _localUserService.GetUserBySubjectAsync(subject);
 
+                var userSecret = await _localUserService.GetUserSecret(subject, "TOTP");
+                var totpSrecret = (userSecret == null) ? _totpSecret : userSecret.Secret;
+
                 var authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
-                if (!authenticator.CheckCode(_totpSecret, model.Totp, user))
+                if (!authenticator.CheckCode(totpSrecret, model.Totp, user))
                 {
                     ModelState.AddModelError("totp", "TOTP is invalid");
                     return View(model);
@@ -231,11 +234,17 @@ namespace IdentityServerHost.Quickstart.UI
 
                     await HttpContext.SignInAsync("idsrv.mfa", new ClaimsPrincipal(temporaryIdentity));
 
-                    var authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
-                    var totp = authenticator.GetCode(_totpSecret);
+                    // if there's no TOTP secret registered for this user, send an OTP via mail as backup
 
-                    // send OTP by mail (fake this by writing it to the debug output window)
-                    Debug.WriteLine($"OTP: {totp}");
+                    if (!(await _localUserService.UserHasRegisteredTotpSecret(user.Subject)))
+                    {
+                        // generate OTP
+                        var authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
+                        var totp = authenticator.GetCode(_totpSecret);
+
+                        // send OTP by mail (fake this by writing it to the debug output window)
+                        Debug.WriteLine($"OTP: {totp}");
+                    }
 
                     var redirectToAdditionalFactorUrl =
                         Url.Action("AdditionalAuthenticationFactor",
