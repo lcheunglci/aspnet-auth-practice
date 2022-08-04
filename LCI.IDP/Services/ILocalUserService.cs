@@ -30,14 +30,14 @@ namespace LCI.IDP.Services
             string subject,
             string provider,
             string providerIdentityKey);
-        //Task<bool> AddUserSecret(
-        //    string subject, 
-        //    string name, 
-        //    string secret);
-        //Task<UserSecret> GetUserSecret(
-        //    string subject, 
-        //    string name);
-        //Task<bool> UserHasRegisteredTotpSecret(
-        //    string subject);
+        Task<bool> AddUserSecret(
+            string subject,
+            string name,
+            string secret);
+        Task<UserSecret> GetUserSecret(
+            string subject,
+            string name);
+        Task<bool> UserHasRegisteredTotpSecret(
+            string subject);
     }
 }
